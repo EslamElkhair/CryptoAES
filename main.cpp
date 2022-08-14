@@ -4,21 +4,15 @@
 #include "cryptopp/aes.h"
 #include "cryptopp/filters.h"
 
+
 int main(int argc, char* argv[]) {
 
-    //Key and IV setup
-    //AES encryption uses a secret key of a variable length (128-bit, 196-bit or 256-   
-    //bit). This key is secretly exchanged between two parties before communication   
-    //begins. DEFAULT_KEYLENGTH= 16 bytes
     CryptoPP::byte key[ CryptoPP::AES::DEFAULT_KEYLENGTH ], iv[ CryptoPP::AES::BLOCKSIZE ];
     memset( key, 0x00, CryptoPP::AES::DEFAULT_KEYLENGTH );
     memset( iv, 0x00, CryptoPP::AES::BLOCKSIZE );
 
-    //
-    // String and Sink setup
-    //
-    std::string plaintext = "Now is the time for all good men to come to the aide...";
-    std::string ciphertext;
+    std::string plaintext = " Its a Dumb text will be encrypted into cipher text using AES then Decrypted again";
+    std::string encryptedtext;
     std::string decryptedtext;
 
     //
@@ -34,18 +28,18 @@ int main(int argc, char* argv[]) {
     CryptoPP::AES::Encryption aesEncryption(key, CryptoPP::AES::DEFAULT_KEYLENGTH);
     CryptoPP::CBC_Mode_ExternalCipher::Encryption cbcEncryption( aesEncryption, iv );
 
-    CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink( ciphertext ) );
+    CryptoPP::StreamTransformationFilter stfEncryptor(cbcEncryption, new CryptoPP::StringSink( encryptedtext ) );
     stfEncryptor.Put( reinterpret_cast<const unsigned char*>( plaintext.c_str() ), plaintext.length() );
     stfEncryptor.MessageEnd();
 
     //
     // Dump Cipher Text
     //
-    std::cout << "Cipher Text (" << ciphertext.size() << " bytes)" << std::endl;
+    std::cout << "Encrypted Text (" << encryptedtext.size() << " bytes)" << std::endl;
 
-    for( int i = 0; i < ciphertext.size(); i++ ) {
+    for( int i = 0; i < encryptedtext.size(); i++ ) {
 
-        std::cout << "0x" << std::hex << (0xFF & static_cast<CryptoPP::byte>(ciphertext[i])) << " ";
+        std::cout << "0x" << std::hex << (0xFF & static_cast<CryptoPP::byte>(encryptedtext[i])) << " ";
     }
 
     std::cout << std::endl << std::endl;
@@ -57,7 +51,7 @@ int main(int argc, char* argv[]) {
     CryptoPP::CBC_Mode_ExternalCipher::Decryption cbcDecryption( aesDecryption, iv );
 
     CryptoPP::StreamTransformationFilter stfDecryptor(cbcDecryption, new CryptoPP::StringSink( decryptedtext ) );
-    stfDecryptor.Put( reinterpret_cast<const unsigned char*>( ciphertext.c_str() ), ciphertext.size() );
+    stfDecryptor.Put( reinterpret_cast<const unsigned char*>( encryptedtext.c_str() ), encryptedtext.size() );
     stfDecryptor.MessageEnd();
 
     //
